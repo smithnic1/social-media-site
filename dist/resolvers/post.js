@@ -29,6 +29,24 @@ let PostResolver = class PostResolver {
         await forkedEM.persistAndFlush(post);
         return post;
     }
+    async updatePost(id, title, { em }) {
+        const forkedEM = em.fork();
+        const post = await forkedEM.findOne(Post_1.Post, { id });
+        if (!post) {
+            return null;
+        }
+        if (typeof title !== 'undefined') {
+            post.title = title;
+            await forkedEM.persistAndFlush(post);
+        }
+        await forkedEM.persistAndFlush(post);
+        return post;
+    }
+    async deletePost(id, { em }) {
+        const forkedEM = em.fork();
+        await forkedEM.nativeDelete(Post_1.Post, { id });
+        return true;
+    }
 };
 exports.PostResolver = PostResolver;
 __decorate([
@@ -54,6 +72,23 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "createPost", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Post_1.Post, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Arg)('title')),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "updatePost", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "deletePost", null);
 exports.PostResolver = PostResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], PostResolver);
