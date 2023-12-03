@@ -27,7 +27,7 @@ class UserResponse {
     errors?: FieldError[]
 
     @Field(() => User, { nullable: true })
-    user?: Error[]
+    user?: User
 }
 
 @Resolver()
@@ -66,7 +66,8 @@ export class UserResolver {
         try {
             await forkedEM.persistAndFlush(user);
         } catch (err) {
-            console.log(err.code)
+            //console log gets err and we can use that to find the code specific to username already exists 
+            // console.log(err.code)
             if (err.code === '23505') {
                 return {
                     errors: [{
@@ -76,13 +77,13 @@ export class UserResolver {
                 }
             }
         }
-        return user;
+        return { user };
     }
 
     @Mutation(() => UserResponse)
     async login(
         @Arg('options') options: UsernamePasswordInput,
-        @Ctx() { em }: MyContext
+        @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
         const forkedEM = em.fork();
         const user = await forkedEM.findOne(User, { username: options.username })
@@ -106,8 +107,13 @@ export class UserResolver {
                 ],
             }
         }
+
+        req.session!.userId = user.id;
+        console.log("Session after:", req.session);
+
+
         return {
-            user
+            user,
         };
     }
 }

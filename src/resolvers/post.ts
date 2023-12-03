@@ -23,7 +23,11 @@ export class PostResolver {
         @Ctx() { em }: MyContext
     ): Promise<Post> {
         const forkedEM = em.fork();
-        const post = forkedEM.create(Post, { title });
+        const post = forkedEM.create(Post, {
+            title,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
         await forkedEM.persistAndFlush(post);
         return post;
     }

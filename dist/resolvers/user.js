@@ -53,7 +53,7 @@ __decorate([
 ], UserResponse.prototype, "errors", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
-    __metadata("design:type", Array)
+    __metadata("design:type", User_1.User)
 ], UserResponse.prototype, "user", void 0);
 UserResponse = __decorate([
     (0, type_graphql_1.ObjectType)()
@@ -88,7 +88,6 @@ let UserResolver = class UserResolver {
             await forkedEM.persistAndFlush(user);
         }
         catch (err) {
-            console.log(err.code);
             if (err.code === '23505') {
                 return {
                     errors: [{
@@ -98,9 +97,9 @@ let UserResolver = class UserResolver {
                 };
             }
         }
-        return user;
+        return { user };
     }
-    async login(options, { em }) {
+    async login(options, { em, req }) {
         const forkedEM = em.fork();
         const user = await forkedEM.findOne(User_1.User, { username: options.username });
         if (!user) {
@@ -123,8 +122,10 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
+        req.session.userId = user.id;
+        console.log("Session after:", req.session);
         return {
-            user
+            user,
         };
     }
 };

@@ -25,7 +25,11 @@ let PostResolver = class PostResolver {
     }
     async createPost(title, { em }) {
         const forkedEM = em.fork();
-        const post = forkedEM.create(Post_1.Post, { title });
+        const post = forkedEM.create(Post_1.Post, {
+            title,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
         await forkedEM.persistAndFlush(post);
         return post;
     }
